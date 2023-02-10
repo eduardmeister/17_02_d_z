@@ -5,7 +5,6 @@ from flask_restx import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import Schema, fields
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -49,5 +48,27 @@ class MovieSchema(Schema):
     director_id = fields.Int()
 
 
+movie_schema = MovieSchema
+
+api = Api(app)
+movie_ns = api.namespace('movies')
+
+
+@movie_ns.route('/')
+class MoviesView(Resource):
+    def get(self):
+        movies = Movie.query.all()
+        return movie_schema.dump(movies, many=True), 200
+
+
+@movie_ns.route('/<int:mid>')
+class MovieView(Resource):
+    def get(self, mid: int):
+        movie = Movie.query.get(mid)
+        if not movie:
+            return '', 404
+        return movie_schema.dump(movie), 200
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
