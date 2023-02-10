@@ -69,7 +69,7 @@ class MoviesView(Resource):
 
     def post(self):
         movie_data = request.json
-        new_movie = (Movie(**movie_data))
+        new_movie = Movie(**movie_data)
         db.session.add(new_movie)
         db.session.commit()
         return '', 201
@@ -107,7 +107,7 @@ class MovieView(Resource):
     def delete(self, mid: int):
         movie = Movie.query.get(mid)
         if not movie:
-            return '', 204
+            return '', 404
 
         db.session.delete(movie)
         db.session.commit()
@@ -115,4 +115,4 @@ class MovieView(Resource):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
